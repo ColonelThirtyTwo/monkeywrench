@@ -3,4 +3,6 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="content" runat="Server">
 		<div id="hostheader" runat="server"></div>
 		<div id="hosthistory" runat="server"></div>
+
+		<asp:Label ID="lblMessage" runat="server" />
 </asp:Content>

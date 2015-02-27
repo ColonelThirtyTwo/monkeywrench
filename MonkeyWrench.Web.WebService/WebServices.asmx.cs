@@ -511,6 +511,10 @@ namespace MonkeyWrench.WebServices
 				Authenticate (db, login, response, true);
 
 				response.Host = FindHost (db, host_id, host);
+
+				if (response.Host == null)
+					return response;
+
 				response.RevisionWorks = new List<DBRevisionWork> ();
 				response.Lanes = new List<string> ();
 				response.Revisions = new List<string> ();

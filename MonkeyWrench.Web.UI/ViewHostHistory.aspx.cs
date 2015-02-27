@@ -41,7 +41,8 @@ public partial class ViewHostHistory : System.Web.UI.Page
 		int masterhost_id = 0;
 
 		if (!int.TryParse (Request ["host_id"], out host_id)) {
-			// ?
+			lblMessage.Text = "<h2>Invalid host ID</h2>";
+			Response.StatusCode = 404;
 			return;
 		}
 
@@ -75,6 +76,12 @@ public partial class ViewHostHistory : System.Web.UI.Page
 			offset = 0;
 
 		response = Master.WebService.GetWorkHostHistory (Master.WebServiceLogin, Utils.TryParseInt32 (Request ["host_id"]), Request ["host"], limit, offset);
+
+		if (response.Host == null) {
+			lblMessage.Text = "<h2>Host not found.</h2>";
+			Response.StatusCode = 404;
+			return;
+		}
 
 		string hdr;
 		if (Authentication.IsInRole (response, MonkeyWrench.DataClasses.Logic.Roles.Administrator)) {
