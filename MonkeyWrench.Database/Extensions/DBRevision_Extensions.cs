@@ -10,11 +10,6 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using MonkeyWrench.DataClasses;
 
 namespace MonkeyWrench.Database
@@ -24,6 +19,11 @@ namespace MonkeyWrench.Database
 		public static DBRevision Create (DB db, int id)
 		{
 			return DBRecord_Extensions.Create (db, new DBRevision (), DBRevision.TableName, id);
+		}
+
+		public static DBRevision Load(DB db, int id)
+		{
+			return DBRecord_Extensions.Load<DBRevision> (db, DBRevision.TableName, id);
 		}
 	}
 }

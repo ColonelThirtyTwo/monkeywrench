@@ -154,7 +154,11 @@ namespace MonkeyWrench.WebServices
 			using (DB db = new DB ()) {
 				WebServiceLogin login = Authentication.CreateLogin (Request);
 
-				revision = DBRevision_Extensions.Create (db, revision_id);
+				revision = DBRevision_Extensions.Load (db, revision_id);
+				if (revision == null) {
+					Response.StatusCode = 404;
+					return;
+				}
 
 				// no access restricion on revision logs/diffs
 				Authentication.VerifyAnonymousAccess (Context, db, login);

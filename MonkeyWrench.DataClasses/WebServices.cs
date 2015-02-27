@@ -101,27 +101,37 @@ namespace MonkeyWrench.Web.WebServices
 		/// <summary>
 		/// This method will uncompress the data too (if required)
 		/// </summary>
-		/// <param name="file"></param>
 		/// <returns></returns>
 		public static string DownloadString (string url)
 		{
-			string tmp = null;
-			try {
-				tmp = Path.GetTempFileName ();
-				using (WebClient wc = new WebClient ()) {
-					wc.Headers.Add ("Accept-Encoding", "gzip");
-					wc.DownloadFile (url, tmp);
+			var req = WebRequest.CreateHttp (url);
+			req.Method = "GET";
+			req.AllowAutoRedirect = true;
+			req.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+			req.Timeout = 5000;
 
-					if (wc.ResponseHeaders ["Content-Encoding"] == "gzip") {
-						FileUtilities.GZUncompress (tmp);
-					}
-					return File.ReadAllText (tmp);
-				}
-			} finally {
-				try {
-					File.Delete (tmp);
-				} catch {
-				}
+			HttpWebResponse res;
+			try {
+				res = (HttpWebResponse)req.GetResponse ();
+			} catch (WebException ex) {
+				// GetResponse throws an exception on 404.
+				res = ex.Response as HttpWebResponse;
+				if (res == null)
+					throw;
+			}
+
+			using (res) {
+				if (res.StatusCode == HttpStatusCode.NotFound)
+					return null;
+
+				string resBody;
+				using (var stream = new StreamReader (res.GetResponseStream ()))
+					resBody = stream.ReadToEnd ();
+
+				if (res.StatusCode != HttpStatusCode.OK)
+					throw new Exception (url + " - " + res.StatusCode + ": " + resBody);
+
+				return resBody;
 			}
 		}
 

@@ -34,21 +34,31 @@ public partial class GetRevisionLog : System.Web.UI.Page
 	{
 		int? revision_id = Utils.TryParseInt32 (Request ["id"]);
 		bool raw = Request ["raw"] == "true";
-		string d, l;
 
-		if (revision_id != null) {
-			l = WebServices.DownloadString (WebServices.CreateWebServiceDownloadRevisionUrl (revision_id.Value, false, Master.WebServiceLogin));
-			if (raw) {
-				log.InnerHtml = "<pre>" + HttpUtility.HtmlEncode (l) + "</pre>";
-			} else {
-				log.InnerHtml = "<div style='background-color: #ccccff; padding: 5px; margin-top: 5px; margin-bottom: 5px;'><pre style='border-width: 0px;'>" + HttpUtility.HtmlEncode (l) + "</pre></div>";
-			}
-			d = WebServices.DownloadString (WebServices.CreateWebServiceDownloadRevisionUrl (revision_id.Value, true, Master.WebServiceLogin));
-			if (raw) {
-				diff.InnerHtml = "<pre>" + HttpUtility.HtmlEncode (d) + "</pre>";
-			} else {
-				diff.InnerHtml = ParseDiff (d);
-			}
+		if (revision_id == null) {
+			log.InnerHtml = "<h2>Invalid revision ID</h2>";
+			Response.StatusCode = 404;
+			return;
+		}
+
+		string nlog = WebServices.DownloadString (WebServices.CreateWebServiceDownloadRevisionUrl (revision_id.Value, false, Master.WebServiceLogin));
+		string ndiff = WebServices.DownloadString (WebServices.CreateWebServiceDownloadRevisionUrl (revision_id.Value, true, Master.WebServiceLogin));
+
+		if (nlog == null || ndiff == null) {
+			log.InnerHtml = "<h2>Revision not found.</h2>";
+			Response.StatusCode = 404;
+			return;
+		}
+
+		if (raw) {
+			log.InnerHtml = "<pre>" + HttpUtility.HtmlEncode (nlog) + "</pre>";
+		} else {
+			log.InnerHtml = "<div style='background-color: #ccccff; padding: 5px; margin-top: 5px; margin-bottom: 5px;'><pre style='border-width: 0px;'>" + HttpUtility.HtmlEncode (nlog) + "</pre></div>";
+		}
+		if (raw) {
+			diff.InnerHtml = "<pre>" + HttpUtility.HtmlEncode (ndiff) + "</pre>";
+		} else {
+			diff.InnerHtml = ParseDiff (ndiff);
 		}
 	}
 

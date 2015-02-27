@@ -38,6 +38,23 @@ namespace MonkeyWrench.Database
 			return record;
 		}
 
+		public static T Load<T>(DB db, string table, int id) where T : DBRecord, new()
+		{
+			T record = new T();
+			using (IDbCommand cmd = db.CreateCommand ()) {
+				cmd.CommandText = "SELECT * FROM " + table + " WHERE id = " + id.ToString ();
+				using (IDataReader reader = cmd.ExecuteReader ()) {
+					if (!reader.Read ())
+						return null;
+					record.Load (reader);
+					if (reader.Read ())
+						throw new Exception (string.Format ("Found more than one record with the id {0} in the table {1}", id, table));
+				}
+			}
+
+			return record;
+		}
+
 		public static void Save ( this DBRecord me, DB db)
 		{
 			me.Save (db);
