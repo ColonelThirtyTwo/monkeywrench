@@ -105,6 +105,12 @@ public partial class ViewTable : System.Web.UI.Page
 			return;
 		}
 
+		if (response.Lane == null || response.Host == null) {
+			Response.StatusCode = 404;
+			lblMessage.Text = "<h2>Lane or Host not found.</h2>";
+			return;
+		}
+
 		dblane = response.Lane;
 		dbhost = response.Host;
 

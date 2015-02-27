@@ -1834,6 +1834,10 @@ UPDATE Work SET state = @state WHERE Work.revisionwork_id = (SELECT RevisionWork
 					Authenticate (db, login, response);
 					response.Lane = FindLane (db, lane_id, lane);
 					response.Host = FindHost (db, host_id, host);
+
+					if(response.Host == null || response.Lane == null)
+						return response;
+
 					response.Count = DBRevisionWork_Extensions.GetCount (db, response.Lane.id, response.Host.id);
 					response.Page = page;
 					response.PageSize = page_size;
