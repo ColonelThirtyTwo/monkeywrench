@@ -66,7 +66,8 @@ public partial class ViewLane : System.Web.UI.Page
 		DBRevision revision = response.Revision;
 
 		if (lane == null || host == null || revision == null) {
-			Response.Redirect ("index.aspx", false);
+			Response.StatusCode = 404;
+			lblMessage.Text = "<h2>Revision Work not found.</h2>";
 			return;
 		}
 

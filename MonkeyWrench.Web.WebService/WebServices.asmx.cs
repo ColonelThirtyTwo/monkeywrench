@@ -1132,6 +1132,10 @@ ORDER BY Lanefiles.lane_id, Lanefile.name ASC;", response.Lane.id).AppendLine ()
 					response.Lane = FindLane (db, lane_id, lane);
 					response.Host = FindHost (db, host_id, host);
 					response.Revision = FindRevision (db, revision_id, revision);
+
+					if(response.Lane == null || response.Host == null || response.Revision == null)
+						return response;
+
 					response.RevisionWork = DBRevisionWork_Extensions.Find (db, response.Lane, response.Host, response.Revision);
 					if (response.RevisionWork != null && response.RevisionWork.workhost_id.HasValue) {
 						response.WorkHost = FindHost (db, response.RevisionWork.workhost_id, null);
